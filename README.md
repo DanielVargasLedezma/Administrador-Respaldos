@@ -1,2 +1,2 @@
 # Administrador-Respaldos
-Proyecto de Administración de Bases de Datos del grupo C
+Proyecto de Administración de Bases de Datos del grupo D
