@@ -1,6 +1,6 @@
 <template>
   <div>
-    <select @change="elegirSchema">
+    <select name="schemas" @change="handleChange">
       <option value="default" selected="Selected" disabled>
         --Seleccione un schema--
       </option>
@@ -13,7 +13,26 @@
       </option>
     </select>
     <br /><br />
-    <button @click="probar">Probar</button>
+    <button @click="elegirSchema">Cargar Tablas</button>
+
+    <br /><br />
+
+    <section v-if="eleccion_schema">
+      <select name="tablas" @change="handleChange">
+        <option value="default" selected="Selected" disabled>
+          --Seleccione una tabla--
+        </option>
+        <option
+          v-for="(tabla, index) in tablas"
+          :key="index"
+          :value="tabla.table_name"
+        >
+          {{ tabla.table_name }}
+        </option>
+      </select>
+      <br /><br />
+      <button @click="probar">Respaldar Tabla</button>
+    </section>
   </div>
 </template>
 
@@ -25,6 +44,9 @@ export default {
     return {
       schemas: [],
       schema_elegido: "",
+      eleccion_schema: false,
+      tablas: [],
+      tabla_elegida: "",
     };
   },
   async mounted() {
@@ -42,8 +64,29 @@ export default {
         });
     },
     hacerRespaldo: async function () {},
-    elegirSchema: function (e) {
-      this.schema_elegido = e.target.value;
+    handleChange: function (e) {
+      switch (e.target.name) {
+        case "schemas":
+          this.schema_elegido = e.target.value;
+          this.eleccion_schema = false;
+          break;
+        case "tablas":
+          this.tabla_elegida = e.target.value;
+          break;
+        default:
+          break;
+      }
+    },
+    elegirSchema: async function () {
+      await managerController
+        .getTablesFromSchema(this.schema_elegido)
+        .then((response) => {
+          this.tablas = response;
+          this.eleccion_schema = true;
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     },
   },
 };

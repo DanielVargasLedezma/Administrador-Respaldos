@@ -18,5 +18,7 @@ use Illuminate\Http\Request;
 Route::prefix('ADR')->group(function () {
     Route::get('/schemas', [StronkController::class, 'schemas']);
 
-    Route::get('/schemas/tablas', [StronkController::class, 'tablasDeSchemas']);
+    Route::get('/schemas/tablas/{schema}', [StronkController::class, 'tablasDeSchemas']);
+
+    Route::get('/backup/schemas/{schema}', [StronkController::class, 'createSchemaBackUp']);
 });

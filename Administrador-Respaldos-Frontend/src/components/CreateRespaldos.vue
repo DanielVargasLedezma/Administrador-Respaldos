@@ -14,7 +14,7 @@
     </select>
     <br />
     <br />
-    <button @click="elegir" :disabled="!opcion">Elegir Respaldo</button>
+    <button @click="elegir" :disabled="!opcion">Elegir Tipo Respaldo</button>
     <br />
     <br />
     <br />

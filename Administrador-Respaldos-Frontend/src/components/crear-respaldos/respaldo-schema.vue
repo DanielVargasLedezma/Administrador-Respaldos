@@ -13,7 +13,7 @@
       </option>
     </select>
     <br /><br />
-    <button @click="probar">Probar</button>
+    <button @click="probar">Realizar Respaldo</button>
   </div>
 </template>
 

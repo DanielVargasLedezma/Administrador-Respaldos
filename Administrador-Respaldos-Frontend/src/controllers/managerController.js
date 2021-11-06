@@ -14,4 +14,14 @@ export default {
         throw error.response;
       });
   },
+  getTablesFromSchema: async (schema) => {
+    return await axios
+      .get(global.url + "schemas/tablas/" + schema)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        throw error.response;
+      });
+  },
 };
