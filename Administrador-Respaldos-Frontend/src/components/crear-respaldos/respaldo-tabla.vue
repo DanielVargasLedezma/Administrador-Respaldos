@@ -13,7 +13,9 @@
       </option>
     </select>
     <br /><br />
-    <button @click="elegirSchema">Cargar Tablas</button>
+    <button @click="elegirSchema" :disabled="!schema_elegido">
+      Cargar Tablas
+    </button>
 
     <br /><br />
 
@@ -31,7 +33,9 @@
         </option>
       </select>
       <br /><br />
-      <button @click="probar">Respaldar Tabla</button>
+      <button @click="hacerRespaldo" :disabled="sent || !tabla_elegida">
+        Respaldar Tabla
+      </button>
     </section>
   </div>
 </template>
@@ -43,17 +47,18 @@ export default {
   data() {
     return {
       schemas: [],
-      schema_elegido: "",
+      schema_elegido: null,
       eleccion_schema: false,
       tablas: [],
-      tabla_elegida: "",
+      tabla_elegida: null,
+      sent: false,
     };
   },
   async mounted() {
-    await this.probar();
+    await this.cargarSchemas();
   },
   methods: {
-    probar: async function () {
+    cargarSchemas: async function () {
       await managerController
         .getSchemas()
         .then((res) => {
@@ -63,7 +68,24 @@ export default {
           console.error(error);
         });
     },
-    hacerRespaldo: async function () {},
+    hacerRespaldo: async function () {
+      this.sent = true;
+
+      await managerController
+        .doATableSchemaBackUp(this.schema_elegido, this.tabla_elegida)
+        .then((res) => {
+          this.downloadFile(res, "BACKUP");
+          this.sent = false;
+
+          managerController.deleteATableSchemaBackUp(
+            this.schema_elegido,
+            this.tabla_elegida
+          );
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    },
     handleChange: function (e) {
       switch (e.target.name) {
         case "schemas":
@@ -87,6 +109,30 @@ export default {
         .catch((error) => {
           console.error(error);
         });
+    },
+    downloadFile(response, filename) {
+      // It is necessary to create a new blob object with mime-type explicitly set
+      // otherwise only Chrome works like it should
+      var newBlob = new Blob([response.data]);
+
+      // IE doesn't allow using a blob object directly as link href
+      // instead it is necessary to use msSaveOrOpenBlob
+      if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+        window.navigator.msSaveOrOpenBlob(newBlob);
+        return;
+      }
+
+      // For other browsers:
+      // Create a link pointing to the ObjectURL containing the blob.
+      const data = window.URL.createObjectURL(newBlob);
+      var link = document.createElement("a");
+      link.href = data;
+      link.download = filename + ".DMP";
+      link.click();
+      setTimeout(function () {
+        // For Firefox it is necessary to delay revoking the ObjectURL
+        window.URL.revokeObjectURL(data);
+      }, 100);
     },
   },
 };

@@ -13,7 +13,9 @@
       </option>
     </select>
     <br /><br />
-    <button @click="probar">Realizar Respaldo</button>
+    <button @click="hacerRespaldo" :disabled="sent || !schema_elegido">
+      Realizar Respaldo
+    </button>
   </div>
 </template>
 
@@ -24,14 +26,15 @@ export default {
   data() {
     return {
       schemas: [],
-      schema_elegido: "",
+      schema_elegido: null,
+      sent: false,
     };
   },
   async mounted() {
-    await this.probar();
+    await this.cargarSchemas();
   },
   methods: {
-    probar: async function () {
+    cargarSchemas: async function () {
       await managerController
         .getSchemas()
         .then((res) => {
@@ -41,9 +44,45 @@ export default {
           console.error(error);
         });
     },
-    hacerRespaldo: async function () {},
+    hacerRespaldo: async function () {
+      this.sent = true;
+
+      await managerController
+        .doASchemaBackUp(this.schema_elegido)
+        .then((response) => {
+          this.downloadFile(response, "BACKUP");
+          this.sent = false;
+
+          managerController.deleteASchemaBackUp(this.schema_elegido);
+        })
+        .catch((error) => console.error(error));
+    },
     elegirSchema: function (e) {
       this.schema_elegido = e.target.value;
+    },
+    downloadFile(response, filename) {
+      // It is necessary to create a new blob object with mime-type explicitly set
+      // otherwise only Chrome works like it should
+      var newBlob = new Blob([response.data]);
+
+      // IE doesn't allow using a blob object directly as link href
+      // instead it is necessary to use msSaveOrOpenBlob
+      if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+        window.navigator.msSaveOrOpenBlob(newBlob);
+        return;
+      }
+
+      // For other browsers:
+      // Create a link pointing to the ObjectURL containing the blob.
+      const data = window.URL.createObjectURL(newBlob);
+      var link = document.createElement("a");
+      link.href = data;
+      link.download = filename + ".DMP";
+      link.click();
+      setTimeout(function () {
+        // For Firefox it is necessary to delay revoking the ObjectURL
+        window.URL.revokeObjectURL(data);
+      }, 100);
     },
   },
 };

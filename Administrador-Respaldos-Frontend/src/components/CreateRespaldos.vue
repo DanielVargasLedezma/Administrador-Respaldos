@@ -14,7 +14,9 @@
     </select>
     <br />
     <br />
-    <button @click="elegir" :disabled="!opcion">Elegir Tipo Respaldo</button>
+    <button @click="elegir" :disabled="sent || !opcion">
+      Elegir Tipo Respaldo
+    </button>
     <br />
     <br />
     <br />
@@ -27,6 +29,7 @@ export default {
   data() {
     return {
       opcion: null,
+      sent: false,
     };
   },
   methods: {
@@ -39,12 +42,49 @@ export default {
           this.$router.push("/crear-respaldos/tablas");
           break;
         case "3":
-          this.$router.push("/crear-respaldos/full");
+          this.hacerRespaldo();
           break;
 
         default:
           break;
       }
+    },
+    hacerRespaldo: async function () {
+      this.sent = true;
+
+      await managerController
+        .doADatabaseBackUp()
+        .then((response) => {
+          this.downloadFile(response, "BACKUP");
+          this.sent = false;
+
+          managerController.deleteADatabaseBackUp();
+        })
+        .catch((error) => console.error(error));
+    },
+    downloadFile(response, filename) {
+      // It is necessary to create a new blob object with mime-type explicitly set
+      // otherwise only Chrome works like it should
+      var newBlob = new Blob([response.data]);
+
+      // IE doesn't allow using a blob object directly as link href
+      // instead it is necessary to use msSaveOrOpenBlob
+      if (window.navigator && window.navigator.msSaveOrOpenBlob) {
+        window.navigator.msSaveOrOpenBlob(newBlob);
+        return;
+      }
+
+      // For other browsers:
+      // Create a link pointing to the ObjectURL containing the blob.
+      const data = window.URL.createObjectURL(newBlob);
+      var link = document.createElement("a");
+      link.href = data;
+      link.download = filename + ".DMP";
+      link.click();
+      setTimeout(function () {
+        // For Firefox it is necessary to delay revoking the ObjectURL
+        window.URL.revokeObjectURL(data);
+      }, 100);
     },
     cambiarEleccion: function (e) {
       this.opcion = e.target.value;

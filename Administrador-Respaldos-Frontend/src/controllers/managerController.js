@@ -24,4 +24,64 @@ export default {
         throw error.response;
       });
   },
+  doASchemaBackUp: async (schema) => {
+    return await axios
+      .get(global.url + "backup/schemas/" + schema)
+      .then((response) => {
+        return response;
+      })
+      .catch((error) => {
+        throw error.response;
+      });
+  },
+  deleteASchemaBackUp: async (schema) => {
+    return await axios
+      .delete(global.url + "backup/schemas/" + schema)
+      .then((response) => {
+        return response.status;
+      })
+      .catch((error) => {
+        throw error.response;
+      });
+  },
+  doATableSchemaBackUp: async (schema, table) => {
+    return await axios
+      .get(global.url + `backup/schemas/tables/${schema}/${table}`)
+      .then((response) => {
+        return response;
+      })
+      .catch((error) => {
+        throw error.response;
+      });
+  },
+  deleteATableSchemaBackUp: async (schema, table) => {
+    return await axios
+      .delete(global.url + `backup/schemas/tables/${schema}/${table}`)
+      .then((response) => {
+        return response.status;
+      })
+      .catch((error) => {
+        throw error.response;
+      });
+  },
+  doADatabaseBackUp: async () => {
+    return await axios
+      .get(global.url + "backup/full")
+      .then((response) => {
+        return response;
+      })
+      .catch((error) => {
+        throw error.response;
+      });
+  },
+  deleteADatabaseBackUp: async () => {
+    return await axios
+      .delete(global.url + "backup/full")
+      .then((response) => {
+        return response.status;
+      })
+      .catch((error) => {
+        throw error.response;
+      });
+  },
 };

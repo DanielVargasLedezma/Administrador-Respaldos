@@ -1,7 +1,7 @@
 <template>
   <div id="navbar">
     <div id="half1">
-      <div id="logonav">Menú</div>
+      <div id="logonav"><router-link to="/">Menú</router-link></div>
       <div><br /><br /></div>
       <div id="tablero" tabindex="1">
         <router-link
