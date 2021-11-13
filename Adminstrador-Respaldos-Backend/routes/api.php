@@ -15,8 +15,8 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::prefix('ADR')->group(function () 
-{
+Route::prefix('ADR')->group(function () {
+
     Route::get('/schemas', [StronkController::class, 'schemas']);
 
     Route::get('/schemas/tablas/{schema}', [StronkController::class, 'tablasDeSchemas']);
@@ -32,4 +32,8 @@ Route::prefix('ADR')->group(function ()
     Route::get('/backup/full', [StronkController::class, 'createDatabaseBackUp']);
 
     Route::delete('/backup/full', [StronkController::class, 'deleteDatabaseBackUp']);
+
+    Route::post('/recover/schemas/{schema}', [StronkController::class, 'recoverSchemaBackUp']);
+
+    Route::delete('/recover/schemas/{schema}', [StronkController::class, 'deleteRecoverSchemaBackUp']);
 });

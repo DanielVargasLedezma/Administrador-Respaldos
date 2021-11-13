@@ -1,12 +1,12 @@
 <template>
   <div class="select-box">
     <label class="label select-box1"
-      ><span class="label-desc">Elija el respaldo que desea realizar</span>
+      ><span class="label-desc">Elija el recuperación que desea realizar</span>
     </label>
     <br /><br />
     <select @change="cambiarEleccion" name="respaldos" id="select-box1">
       <option value="default" selected="Selected" disabled>
-        --Seleccione un tipo de respaldo--
+        --Seleccione un tipo de recuperación--
       </option>
       <option value="1">Schemas</option>
       <option value="2">Tablas</option>
@@ -15,34 +15,35 @@
     <br />
     <br />
     <button @click="elegir" :disabled="sent || !opcion">
-      Elegir Tipo Respaldo
+      Elegir Tipo Recuperación
     </button>
     <br />
     <br />
-    <br />
+
     <router-view></router-view>
   </div>
 </template>
 
 <script>
+import managerController from "../../controllers/managerController";
+
 export default {
   data() {
     return {
-      opcion: null,
       sent: false,
+      opcion: null,
     };
   },
   methods: {
     elegir: function () {
       switch (this.opcion) {
         case "1":
-          this.$router.push("/crear-respaldos/schemas");
+          this.$router.push("/recuperar-respaldos/schemas");
           break;
         case "2":
-          this.$router.push("/crear-respaldos/tablas");
+          this.$router.push("/recuperar-respaldos/tablas");
           break;
         case "3":
-          this.hacerRespaldo();
           break;
 
         default:
@@ -56,11 +57,12 @@ export default {
         .doADatabaseBackUp()
         .then((response) => {
           this.downloadFile(response, "BACKUP");
-          this.sent = false;
 
           managerController.deleteADatabaseBackUp();
         })
         .catch((error) => console.error(error));
+
+      this.sent = false;
     },
     downloadFile(response, filename) {
       // It is necessary to create a new blob object with mime-type explicitly set
@@ -93,7 +95,6 @@ export default {
 };
 </script>
 
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 @import url(https://fonts.googleapis.com/css?family=Source+Sans+Pro);
 
@@ -104,7 +105,6 @@ body {
 }
 
 .select-box {
-  cursor: pointer;
   position: relative;
   max-width: 20em;
   margin: 5em auto;
@@ -114,6 +114,10 @@ body {
 label,
 footer {
   font-family: sans-serif;
+}
+
+button {
+  cursor: pointer;
 }
 
 label {

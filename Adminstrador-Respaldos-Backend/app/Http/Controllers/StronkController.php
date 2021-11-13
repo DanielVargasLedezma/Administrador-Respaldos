@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Symfony\Component\Process\Process;
+use App\Http\Requests\DumpFileRequest;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
@@ -52,7 +52,7 @@ class StronkController extends Controller
 
         // DB::statement('GRANT READ, WRITE ON DIRECTORY RESPALDO TO administrador_fachero');
 
-        $cmd = "EXPDP administrador_fachero/root1234@XE SCHEMAS=". $schema . " DIRECTORY=RESPALDO DUMPFILE=" . $schema .".DMP LOGFILE=". $schema .".LOG";
+        $cmd = "EXPDP administrador_fachero/root1234@XE SCHEMAS=" . $schema . " DIRECTORY=RESPALDO DUMPFILE=" . $schema . ".DMP LOGFILE=" . $schema . ".LOG";
 
         shell_exec($cmd);
 
@@ -94,7 +94,7 @@ class StronkController extends Controller
 
         // DB::statement('GRANT READ, WRITE ON DIRECTORY RESPALDO TO administrador_fachero');
 
-        $cmd = "EXPDP administrador_fachero/root1234@XE TABLES=". $schema . "." . $table ." DIRECTORY=RESPALDO DUMPFILE=" . $schema . $table .".DMP LOGFILE=". $schema . $table .".LOG";
+        $cmd = "EXPDP administrador_fachero/root1234@XE TABLES=" . $schema . "." . $table . " DIRECTORY=RESPALDO DUMPFILE=" . $schema . $table . ".DMP LOGFILE=" . $schema . $table . ".LOG";
 
         shell_exec($cmd);
 
@@ -157,6 +157,50 @@ class StronkController extends Controller
         File::delete($path);
 
         $path = 'respaldos/XE.LOG';
+
+        File::delete($path);
+
+        return response(null, 204);
+    }
+
+    /**
+     * Receives the DUMP file and recovers a schema backup.
+     * 
+     * @return \Illuminate\Http\Response
+     */
+    public function recoverSchemaBackUp(DumpFileRequest $request, $schema)
+    {
+        $request->validated();
+
+        DB::statement('alter session set "_oracle_script"=true');
+
+        DB::statement("CREATE OR REPLACE DIRECTORY RECUPERACION AS " . "'" . public_path() . "\\respaldos\\restore'");
+
+        $newFileName = $schema . '.' . $request->file->extension();
+
+        $request->file->move(public_path('respaldos\\restore'), $newFileName);
+
+        $cmd = "IMPDP administrador_fachero/root1234@XE SCHEMAS=" . $schema . " DIRECTORY=RECUPERACION DUMPFILE=" . $schema . ".DMP LOGFILE=" . $schema . ".LOG";
+
+        shell_exec($cmd);
+
+        $path = 'respaldos/restore/' . $schema . ".LOG";
+
+        return response()->download($path);
+    }
+
+    /**
+     * Delete the DUMP and LOG file received for the recover of a certain $schema.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function deleteRecoverSchemaBackUp($schema)
+    {
+        $path = 'respaldos/restore/' . $schema . '.DMP';
+
+        File::delete($path);
+
+        $path = 'respaldos/restore/' . $schema . '.LOG';
 
         File::delete($path);
 

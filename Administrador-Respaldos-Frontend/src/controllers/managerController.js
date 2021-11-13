@@ -84,4 +84,30 @@ export default {
         throw error.response;
       });
   },
+  doASchemaRestore: async (schema, file) => {
+    const data = new FormData();
+
+    console.log(file.type);
+
+    data.append("file", file, file.name);
+
+    return await axios
+      .post(global.url + "recover/schemas/" + schema, data)
+      .then((response) => {
+        return response;
+      })
+      .catch((error) => {
+        throw error.response;
+      });
+  },
+  deleteASchemaRestoreFile: async (schema) => {
+    return await axios
+      .delete(global.url + "recover/schemas/" + schema)
+      .then((response) => {
+        return response.status;
+      })
+      .catch((error) => {
+        throw error.response;
+      });
+  },
 };
