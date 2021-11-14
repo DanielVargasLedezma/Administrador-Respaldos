@@ -206,4 +206,134 @@ class StronkController extends Controller
 
         return response(null, 204);
     }
+
+    /**
+     * Createa a tablespace with a certain $request->input('name').
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function createTablespace(Request $request)
+    {
+        $fields = $request->validate([
+            'name' => 'required',
+        ]);
+
+        DB::statement('alter session set "_oracle_script"=true');
+
+        DB::statement("CREATE TABLESPACE " . $fields['name'] . " DATAFILE '" . public_path() . "\\tablespaces\\" . $fields['name'] . ".DBF' SIZE 100M AUTOEXTEND ON NEXT 50");
+
+        return response(['message' => 'Tablespace creado con éxito'], 201);
+    }
+
+    /**
+     * Create a tablespace with a certain $request->input('name').
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function createTemporaryTablespace(Request $request)
+    {
+        $fields = $request->validate([
+            'name' => 'required',
+        ]);
+
+        DB::statement('alter session set "_oracle_script"=true');
+
+        DB::statement("CREATE TEMPORARY TABLESPACE " . $fields['name'] . "_TEMP TEMPFILE '" . public_path() . "\\tablespaces\\" . $fields['name'] . "_TEMP.DBF' SIZE 25M AUTOEXTEND ON NEXT 50");
+
+        return response(['message' => 'Tablespace creado con éxito'], 201);
+    }
+
+    /**
+     * Returns the public path of respaldos.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function publicPath()
+    {
+        return response(['path' => public_path() . "\\respaldos"], 200);
+    }
+
+    /**
+     * Delete a certain $tablespace.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function deleteTablespace($tablespace)
+    {
+        DB::statement('alter session set "_oracle_script"=true');
+
+        DB::statement("DROP TABLESPACE " . $tablespace . " INCLUDING CONTENTS AND DATAFILES");
+
+        return response(null, 204);
+    }
+
+    /**
+     * Display a listing of the tablespaces.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function tablespaces()
+    {
+        return DB::table('USER_TABLESPACES')
+            ->select('TABLESPACE_NAME')
+            ->get();
+    }
+
+    /**
+     * Display a listing of the columns of a certain $table of a certain $schema.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function columnOfATableOfASchema($schema, $table)
+    {
+        return DB::select("select column_name from all_tab_columns where table_name ='" . $table . "' AND OWNER ='" . $schema . "'");
+    }
+
+    /**
+     * Resize a certain $tablespace.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function resizeTablespace(Request $request)
+    {
+        $fields = $request->validate([
+            "tablespace" => "required",
+            "size" => "required",
+        ]);
+
+        $resultado = DB::table("v\$datafile")
+            ->select("NAME")
+            ->where("NAME", "LIKE", "%" . $fields['tablespace'] . "%")
+            ->get();
+
+        $resultado = $resultado[0]->name;
+
+        DB::statement("ALTER DATABASE DATAFILE '$resultado' resize " . $fields['size'] . "M");
+
+        return response(['route' => 'Resize exitoso'], 200);
+    }
+
+    /**
+     * Resize a certain $tablespace.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function resizeTemporaryTablespace(Request $request)
+    {
+        $fields = $request->validate([
+            "tablespace" => "required",
+            "size" => "required",
+        ]);
+
+        $resultado = DB::table("v\$tempfile")
+            ->select("NAME")
+            ->where("NAME", "LIKE", "%" . $fields['tablespace'] . "%")
+            ->get();
+
+        $resultado = $resultado[0]->name;
+
+        DB::statement("ALTER DATABASE DATAFILE '$resultado' resize " . $fields['size'] . "M");
+
+        return response(['route' => 'Resize exitoso'], 200);
+    }
 }

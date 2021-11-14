@@ -10,8 +10,12 @@
   "dependencies": {
     "axios": "^0.24.0",
     "core-js": "^3.6.5",
+    "devextreme": "21.2.3",
+    "devextreme-vue": "21.2.3",
+    "laravel-file-manager": "^2.5.4",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0",
+    "vuetify-file-browser": "^1.0.2",
     "vuex": "^4.0.0-0"
   },
   "devDependencies": {

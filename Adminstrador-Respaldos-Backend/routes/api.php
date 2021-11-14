@@ -19,6 +19,8 @@ Route::prefix('ADR')->group(function () {
 
     Route::get('/schemas', [StronkController::class, 'schemas']);
 
+    Route::get('/path', [StronkController::class, 'publicPath']);
+
     Route::get('/schemas/tablas/{schema}', [StronkController::class, 'tablasDeSchemas']);
 
     Route::get('/backup/schemas/{schema}', [StronkController::class, 'createSchemaBackUp']);
@@ -36,4 +38,18 @@ Route::prefix('ADR')->group(function () {
     Route::post('/recover/schemas/{schema}', [StronkController::class, 'recoverSchemaBackUp']);
 
     Route::delete('/recover/schemas/{schema}', [StronkController::class, 'deleteRecoverSchemaBackUp']);
+
+    Route::post('/create/tablespace', [StronkController::class, 'createTablespace']);
+
+    Route::post('/create/temporary-tablespace', [StronkController::class, 'createTemporaryTablespace']);
+
+    Route::delete('/delete/tablespace/{tablespace}', [StronkController::class, 'deleteTablespace']);
+
+    Route::get('/tablespaces', [StronkController::class, 'tablespaces']);
+
+    Route::get('/columns/{schema}/{table}', [StronkController::class, 'columnOfATableOfASchema']);
+
+    Route::post('/tablespaces/resize', [StronkController::class, 'resizeTablespace']);
+
+    Route::post('/temporary-tablespaces/resize', [StronkController::class, 'resizeTemporaryTablespace']);
 });

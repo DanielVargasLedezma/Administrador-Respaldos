@@ -111,13 +111,13 @@ body {
   width: 100%;
 }
 
+button {
+  cursor: pointer;
+}
+
 label,
 footer {
   font-family: sans-serif;
-}
-
-button {
-  cursor: pointer;
 }
 
 label {
@@ -126,6 +126,12 @@ label {
 }
 
 select {
+  font-size: 0.9rem;
+  padding: 2px 5px;
+  cursor: pointer;
+}
+
+input {
   font-size: 0.9rem;
   padding: 2px 5px;
 }

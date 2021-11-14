@@ -106,11 +106,14 @@ body {
 }
 
 .select-box {
-  cursor: pointer;
   position: relative;
   max-width: 20em;
   margin: 5em auto;
   width: 100%;
+}
+
+button {
+  cursor: pointer;
 }
 
 label,
@@ -124,6 +127,12 @@ label {
 }
 
 select {
+  font-size: 0.9rem;
+  padding: 2px 5px;
+  cursor: pointer;
+}
+
+input {
   font-size: 0.9rem;
   padding: 2px 5px;
 }
