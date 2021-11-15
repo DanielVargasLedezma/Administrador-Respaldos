@@ -4,7 +4,7 @@
       ><span class="label-desc">Elija el respaldo que desea realizar</span>
     </label>
     <br /><br />
-    <select @change="cambiarEleccion" name="respaldos" id="select-box1">
+    <select @change="cambiarEleccion" name="respaldos">
       <option value="default" selected="Selected" disabled>
         --Seleccione un tipo de respaldo--
       </option>
@@ -106,14 +106,13 @@ body {
 }
 
 .select-box {
+  border-radius: 5px;
+  background-color: #f2f2f2;
+  padding: 20px;
   position: relative;
   max-width: 20em;
   margin: 5em auto;
   width: 100%;
-}
-
-button {
-  cursor: pointer;
 }
 
 label,
@@ -126,15 +125,30 @@ label {
   padding-right: 10px;
 }
 
+input[type="text"],
 select {
-  font-size: 0.9rem;
-  padding: 2px 5px;
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+button {
+  width: 100%;
+  background-color: #4caf50;
+  color: white;
+  padding: 14px 20px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 4px;
   cursor: pointer;
 }
 
-input {
-  font-size: 0.9rem;
-  padding: 2px 5px;
+button:hover {
+  background-color: #45a049;
 }
 
 footer {

@@ -1,20 +1,18 @@
 <template>
-  <div class="select-box">
-    <select id="seleccionar" ref="comboBoxT" @change="cambiarEleccion">
-      <option value="default" selected="Selected" disabled>
-        --Seleccione un tipo de respaldo--
-      </option>
-      <option value="1">Explain plan</option>
-      <option value="2">Indices</option>
-      <option value="3">Estadisticas</option>
-    </select>
-    <br />
-    <br />
-    <button @click="elegir" :disabled="sent || !opcion">Elegir consulta</button>
-    <br />
-    <br />
-    <br />
-    <router-view></router-view>
+  <div>
+    <div class="select-box">
+      <select id="seleccionar" ref="comboBoxT" @change="cambiarEleccion">
+        <option value="default" selected="Selected" disabled>
+          -Seleccione un tipo de acción--
+        </option>
+        <option value="1">Asignar Designar Roles</option>
+        <option value="2">Consultar Roles</option>
+        <option value="3">Crear Rol</option>
+      </select>
+      <button @click="elegir" :disabled="sent || !opcion">
+        Elegir Opcion de Seguridad
+      </button>
+    </div>
   </div>
 </template>
 
@@ -31,14 +29,14 @@ export default {
       this.sent = true;
 
       switch (this.opcion) {
-        case "1":
-          this.$router.push("/tunning-consultas/explainPlan");
+        case 1:
+          this.$router.push("/seguridad-usuario/asignacion-rol");
           break;
-        case "2":
-          this.$router.push("/tunning-consultas/indice");
+        case 2:
+          this.$router.push("/seguridad-usuario/consultar-rol");
           break;
-        case "3":
-          this.$router.push("/tunning-consultas/estadistica");
+        case 3:
+          this.$router.push("/seguridad-usuario/crear-rol");
           break;
 
         default:
@@ -48,6 +46,7 @@ export default {
     cambiarEleccion: function (e) {
       this.opcion = e.target.value;
       this.sent = false;
+      console.log(this.opcion);
     },
   },
 };

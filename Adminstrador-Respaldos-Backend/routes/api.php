@@ -52,4 +52,20 @@ Route::prefix('ADR')->group(function () {
     Route::post('/tablespaces/resize', [StronkController::class, 'resizeTablespace']);
 
     Route::post('/temporary-tablespaces/resize', [StronkController::class, 'resizeTemporaryTablespace']);
+
+    Route::post('/estadistica/tabla', [StronkController::class, 'createEstadisticaTabla']);
+
+    Route::post('/estadistica/schema', [StronkController::class, 'createEstadisticaSchema']);
+
+    Route::get('/monitoreo', [StronkController::class, 'doMonitoreoEstado']);
+
+    Route::get('/monitoreo2', [StronkController::class, 'doMonitoreoParametros']);
+
+    Route::get('/monitoreo3', [StronkController::class, 'doMonitoreoConexiones']);
+
+    Route::post('/create-index/schema', [StronkController::class, 'createIndexOnColumnOfTableOfSchema']);
+
+    Route::post('/analize/schema', [StronkController::class, 'analizeSchema']);
+
+    Route::post('/analize-table/schema', [StronkController::class, 'analizeTableOfSchema']);
 });

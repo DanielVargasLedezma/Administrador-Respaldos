@@ -1,53 +1,37 @@
 <template>
   <div>
-    <label class="label select-box1"
-      ><span class="label-desc">Elija el esquema</span>
-    </label>
+    <label>Nombre del rol</label>
     <br /><br />
-    <select @change="elegirSchema">
-      <option value="default" selected="Selected" disabled>
-        --Seleccione un schema--
-      </option>
-      <option
-        v-for="(schema, index) in schemas"
-        :key="index"
-        :value="schema.schema_name"
-      >
-        {{ schema.schema_name }}
-      </option>
-    </select>
+    <input
+      type="text"
+      id="nombre_tbotemp"
+      placeholder="Digite el nombre del rol"
+      v-model="texto"
+    />
     <br /><br />
-    <button type="submit">Hacer ExplainPlan</button>
+    <button @click="crearRol" :disabled="!opcion || sent">Crear Rol</button>
   </div>
 </template>
 
 <script>
-import managerController from "../../controllers/managerController";
-
+/*        
+            return await axios
+      .post(global.url + "seguridad-usuarios/crear-rol/" + texto)
+      .then((response) => {
+        return response.status;
+      })
+      .catch((error) => {
+        throw error.response;
+      });*/
 export default {
   data() {
     return {
-      schemas: [],
-      schema_elegido: null,
+      texto: "",
     };
   },
-  async mounted() {
-    await this.cargarSchemas();
-  },
   methods: {
-    cargarSchemas: async function () {
-      await managerController
-        .getSchemas()
-        .then((res) => {
-          this.schemas = res;
-        })
-        .catch((error) => {
-          console.error(error);
-        });
-    },
-    elegirSchema: async function (e) {
-      this.schema_elegido = e.target.value;
-      await this.cargarTablas();
+    crearRol: function () {
+      console.log(this.texto);
     },
   },
 };

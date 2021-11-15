@@ -1,20 +1,27 @@
 <template>
-  <div class="select-box">
-    <select id="seleccionar" ref="comboBoxT" @change="cambiarEleccion">
-      <option value="default" selected="Selected" disabled>
-        --Seleccione un tipo de respaldo--
-      </option>
-      <option value="1">Explain plan</option>
-      <option value="2">Indices</option>
-      <option value="3">Estadisticas</option>
-    </select>
-    <br />
-    <br />
-    <button @click="elegir" :disabled="sent || !opcion">Elegir consulta</button>
-    <br />
-    <br />
-    <br />
-    <router-view></router-view>
+  <div>
+    <div class="select-box">
+      <label class="label select-box1"
+        ><span class="label-desc"
+          >Escoja el tipo de performance que desea realizar</span
+        >
+      </label>
+      <br /><br />
+      <select @change="cambiarEleccion" name="respaldos" id="select-box1">
+        <option value="default" selected="Selected" disabled>
+          --Seleccione un tipo de performance--
+        </option>
+        <option value="1">Analizar</option>
+        <option value="2">Monitoreo</option>
+      </select>
+      <br />
+      <button @click="elegir" :disabled="sent || !opcion">
+        Elegir Tipo de Performance
+      </button>
+    </div>
+    <section v-if="sent">
+      <router-view></router-view>
+    </section>
   </div>
 </template>
 
@@ -22,25 +29,20 @@
 export default {
   data() {
     return {
-      opcion: null,
       sent: false,
+      opcion: null,
     };
   },
   methods: {
     elegir: function () {
       this.sent = true;
-
       switch (this.opcion) {
         case "1":
-          this.$router.push("/tunning-consultas/explainPlan");
+          this.$router.push("/performance-bd/analizar-bd");
           break;
         case "2":
-          this.$router.push("/tunning-consultas/indice");
+          this.$router.push("/performance-bd/monitoreo-bd");
           break;
-        case "3":
-          this.$router.push("/tunning-consultas/estadistica");
-          break;
-
         default:
           break;
       }

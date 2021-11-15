@@ -4,11 +4,16 @@ import AdminArchivos from "../components/AdminArchivos.vue";
 
 import AdminSchemas from "../components/AdminSchemas.vue";
 
-import PerformanceBD from "../components/PerformanceBD.vue";
+import PerformanceBD from "../components/performance/PerformanceBD.vue";
+import AnalizarBD from "../components/performance/analizar.vue";
+import MonitoreoBD from "../components/performance/monitoreo.vue";
 
 import AuditoriaBD from "../components/AuditoriaBD.vue";
 
-import SeguridadUsuario from "../components/SeguridadUsuario.vue";
+import SeguridadUsuario from "../components/seguridad/SeguridadUsuario.vue";
+import AsignacionRol from "../components/seguridad/asignacion-rol.vue";
+import CrearRol from "../components/seguridad/crear-rol.vue";
+import ConsultarRol from "../components/seguridad/consultar-rol.vue";
 
 import TunningConsultas from "../components/tunning-tablespace/TunningConsultas.vue";
 import Estadisticas from "../components/tunning-tablespace/estadisticas.vue";
@@ -72,7 +77,23 @@ const routes = [
           { path: "indice", component: Indices },
         ],
       },
-      { path: "performance-bd", component: PerformanceBD },
+      {
+        path: "seguridad-usuario",
+        component: SeguridadUsuario,
+        children: [
+          { path: "asignacion-rol", component: AsignacionRol },
+          { path: "crear-rol", component: CrearRol },
+          { path: "consultar-rol", component: ConsultarRol },
+        ],
+      },
+      {
+        path: "performance-bd",
+        component: PerformanceBD,
+        children: [
+          { path: "analizar-bd", component: AnalizarBD },
+          { path: "monitoreo-bd", component: MonitoreoBD },
+        ],
+      },
       { path: "auditoria-bd", component: AuditoriaBD },
       { path: "seguridad-usuarios", component: SeguridadUsuario },
     ],

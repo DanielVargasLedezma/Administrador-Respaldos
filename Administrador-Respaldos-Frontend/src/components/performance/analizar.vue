@@ -1,61 +1,48 @@
 <template>
   <div>
-    <select @change="elegirSchema">
+    <label class="label select-box1"
+      ><span class="label-desc">Escoja que quiere analizar</span>
+    </label>
+    <br /><br />
+    <select @change="cambiarEleccion" name="respaldos" id="select-box1">
       <option value="default" selected="Selected" disabled>
-        --Seleccione un schema--
+        --Seleccione que quiere analizar--
       </option>
-      <option
-        v-for="(schema, index) in schemas"
-        :key="index"
-        :value="schema.schema_name"
-      >
-        {{ schema.schema_name }}
-      </option>
+      <option value="1">Schema</option>
+      <option value="2">Tabla</option>
     </select>
     <br /><br />
-    <select @change="elegirTabla">
-      <option value="default" selected="Selected" disabled>
-        --Seleccione un tablespace--
-      </option>
-      <option
-        v-for="(tabla, index) in tablas"
-        :key="index"
-        :value="tabla.table_name"
-      >
-        {{ tabla.table_name }}
-      </option>
-    </select>
-    <br /><br />
-    <select @change="elegirColumnas">
-      <option value="default" selected="Selected" disabled>
-        --Seleccione una Columna--
-      </option>
-      <option
-        v-for="(col, index) in columnas"
-        :key="index"
-        :value="col.column_name"
-      >
-        {{ col.column_name }}
-      </option>
-      <br /><br />
-    </select>
-    <br /><br />
-    <section v-if="columnas_elegidas.length != 0">
-      <p>Columnas seleccionadas para el índice:</p>
-      <ul>
-        <li
-          v-for="(item, index) in columnas_elegidas"
+    <section v-if="elegido">
+      <select @change="elegirSchema">
+        <option value="default" selected="Selected" disabled>
+          --Seleccione un schema--
+        </option>
+        <option
+          v-for="(schema, index) in schemas"
           :key="index"
-          :value="item"
+          :value="schema.schema_name"
         >
-          {{ item }}
-        </li>
+          {{ schema.schema_name }}
+        </option>
+      </select>
+      <br /><br />
+      <section v-if="!ellanomequiere">
+        <select @change="elegirTabla">
+          <option value="default" selected="Selected" disabled>
+            --Seleccione un tablespace--
+          </option>
+          <option
+            v-for="(tabla, index) in tablas"
+            :key="index"
+            :value="tabla.table_name"
+          >
+            {{ tabla.table_name }}
+          </option>
+        </select>
         <br /><br />
-      </ul>
+      </section>
+      <button v-on:click="hacerAnalizar" type="submit">Hacer Análisis</button>
     </section>
-    <button @click="hacerIndice" :disabled="sent || !schema_elegido">
-      Realizar Indice
-    </button>
   </div>
 </template>
 
@@ -65,34 +52,26 @@ import managerController from "../../controllers/managerController";
 export default {
   data() {
     return {
-      sent: false,
       schemas: [],
       schema_elegido: null,
       tablas: [],
+      elegido: false,
       tabla_elegida: null,
-      columnas: [],
-      columnas_elegidas: [],
-      repeated: [],
+      ellanomequiere: false,
     };
   },
   async mounted() {
     await this.cargarSchemas();
   },
-
   methods: {
-    hacerIndice: async function () {
-      await managerController
-        .createIndexOnTable(
-          this.schema_elegido,
-          this.tabla_elegida,
-          this.columnas_elegidas
-        )
-        .then((res) => {
-          console.log(res);
-        })
-        .catch((error) => {
-          console.error(error);
-        });
+    cambiarEleccion: async function (e) {
+      if (e.target.value === "1") {
+        this.ellanomequiere = true;
+      } else {
+        this.ellanomequiere = false;
+      }
+      this.elegido = true;
+      await this.cargarSchemas();
     },
     cargarSchemas: async function () {
       await managerController
@@ -106,8 +85,6 @@ export default {
     },
     elegirSchema: async function (e) {
       this.schema_elegido = e.target.value;
-      this.columnas_elegidas = [];
-      this.repeated = [];
       await this.cargarTablas();
     },
     cargarTablas: async function () {
@@ -122,7 +99,6 @@ export default {
     },
     elegirTabla: async function (e) {
       this.tabla_elegida = e.target.value;
-
       await managerController
         .getColumnTables(this.schema_elegido, this.tabla_elegida)
         .then((response) => {
@@ -130,20 +106,21 @@ export default {
         })
         .catch((error) => console.error(error));
     },
-    elegirColumnas: function (e) {
-      /*this.columnas_elegidas.forEach((column) => {
-        if (e.target.value === column) {
-          return;
-        }
-      });*/
-      if (!this.repeated.includes(e.target.value)) {
-        this.columnas_elegidas = [...this.columnas_elegidas, e.target.value];
-        this.repeated.push(e.target.value);
+    hacerAnalizar: async function () {
+      if (this.ellanomequiere) {
+        await managerController
+          .doAnalizarSchema(this.schema_elegido)
+          .then((response) => {
+            console.log(response);
+          })
+          .catch((error) => console.error(error));
       } else {
-        this.columnas_elegidas = this.columnas_elegidas.filter(
-          (item) => item !== e.target.value
-        );
-        this.repeated = this.repeated.filter((item) => item !== e.target.value);
+        await managerController
+          .doAnalizarTabla(this.schema_elegido, this.tabla_elegida)
+          .then((response) => {
+            console.log(response);
+          })
+          .catch((error) => console.error(error));
       }
     },
   },

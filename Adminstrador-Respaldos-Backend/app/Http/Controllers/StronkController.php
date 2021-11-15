@@ -301,6 +301,8 @@ class StronkController extends Controller
             "size" => "required",
         ]);
 
+        DB::statement('alter session set "_oracle_script"=true');
+
         $resultado = DB::table("v\$datafile")
             ->select("NAME")
             ->where("NAME", "LIKE", "%" . $fields['tablespace'] . "%")
@@ -325,6 +327,8 @@ class StronkController extends Controller
             "size" => "required",
         ]);
 
+        DB::statement('alter session set "_oracle_script"=true');
+
         $resultado = DB::table("v\$tempfile")
             ->select("NAME")
             ->where("NAME", "LIKE", "%" . $fields['tablespace'] . "%")
@@ -335,5 +339,138 @@ class StronkController extends Controller
         DB::statement("ALTER DATABASE DATAFILE '$resultado' resize " . $fields['size'] . "M");
 
         return response(['route' => 'Resize exitoso'], 200);
+    }
+
+
+    public function createEstadisticaSchema(Request $request)
+    {
+        $fields = $request->validate([
+            "schema" => "required",
+        ]);
+
+        $schema = $fields['schema'];
+
+        DB::statement('alter session set "_oracle_script"=true');
+
+        DB::raw("EXECUTE dbms_stats.gather_schema_stats('$schema' ,cascade=> true)");
+
+        return response(null, 204);
+    }
+    public function createEstadisticaTabla(Request $request)
+    {
+        $fields = $request->validate([
+            "schema" => "required",
+            "tabla" => "required",
+        ]);
+
+        $schema = $fields['schema'];
+
+        $tabla = $fields['tabla'];
+
+        DB::statement('alter session set "_oracle_script"=true');
+
+        DB::raw("EXECUTE dbms_stats.gather_table_stats('$schema', '$tabla' ,cascade=> true)");
+
+        return response(null, 204);
+    }
+
+    public function doMonitoreoEstado()
+    {
+        return DB::table("V\$INSTANCE")
+            ->select()
+            ->get();
+    }
+
+    public function doMonitoreoParametros()
+    {
+        return DB::table("V\$system_parameter")
+            ->select('name', 'value', 'description')
+            ->get();
+    }
+
+    public function doMonitoreoConexiones()
+    {
+        return DB::table("V\$session")
+            ->select('osuser', 'username', 'machine', 'program')
+            ->where('username', '<>', null)
+            ->get();
+    }
+
+    /**
+     * Resize a certain $tablespace.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function createIndexOnColumnOfTableOfSchema(Request $request)
+    {
+        $fields = $request->validate([
+            "schema" => "required",
+            "table" => "required",
+            "campos" => "required",
+        ]);
+
+        DB::statement('alter session set "_oracle_script"=true');
+
+        $validacion = DB::table('USER_TABLESPACES')
+            ->select('TABLESPACE_NAME')
+            ->where('TABLESPACE_NAME', 'INDEX_DATA')
+            ->get();
+
+        if (!$validacion) {
+            DB::statement("CREATE TABLESPACE INDEX_DATA DATAFILE '" . public_path() . "\\tablespaces\\INDEX_DATA.DBF' SIZE 125M AUTOEXTEND ON NEXT 50");
+        }
+
+        $campos = explode(', ', $fields['campos']);
+
+        $query = "CREATE INDEX " . $fields['schema'] . "_" . $fields['table'] . "_" . time() . " ON " . $fields['schema'] . "." . $fields['table'] . "(" . $fields['campos'] . ") TABLESPACE INDEX_DATA";
+
+        DB::statement($query);
+
+        return response(['message' => 'Index creado con éxito'], 201);
+    }
+
+    /**
+     * Analize all the tables of a schema.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function analizeSchema(Request $request)
+    {
+        $fields = $request->validate([
+            "schema" => "required",
+        ]);
+
+        DB::statement('alter session set "_oracle_script"=true');
+
+        $tablas = DB::table('all_tables')
+            ->select('table_name')
+            ->where('owner', $fields['schema'])
+            ->orderBy('table_name')
+            ->get();
+
+        foreach ($tablas as $tabla) {
+            DB::statement("ANALYZE TABLE " . $fields['schema'] . "." . $tabla->table_name . " COMPUTE STATISTICS");
+        }
+
+        return response(['message' => 'Tablas re-analizadas'], 200);
+    }
+
+    /**
+     * Analize a table the tables of a schema.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function analizeTableOfSchema(Request $request)
+    {
+        $fields = $request->validate([
+            "schema" => "required",
+            "tabla" => "required",
+        ]);
+
+        DB::statement('alter session set "_oracle_script"=true');
+
+        DB::statement("ANALYZE TABLE " . $fields['schema'] . "." . $fields['tabla'] . " COMPUTE STATISTICS");
+
+        return response(['message' => 'Tablas re-analizadas'], 200);
     }
 }

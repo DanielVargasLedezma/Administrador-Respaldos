@@ -98,6 +98,104 @@ export default {
         throw error.response;
       });
   },
+  doEstadisticasTabla: async (schema, tabla) => {
+    const formData = new FormData();
+
+    formData.append("schema", schema);
+    formData.append("tabla", tabla);
+
+    return await axios
+      .post(global.url + "estadistica/tabla", formData)
+      .then((response) => {
+        return response.status;
+      })
+      .catch((error) => {
+        throw error.response;
+      });
+  },
+  doEstadisticasSchema: async (schema) => {
+    const formData = new FormData();
+
+    formData.append("schema", schema);
+
+    return await axios
+      .post(global.url + "estadistica/schema", formData)
+      .then((response) => {
+        return response.status;
+      })
+      .catch((error) => {
+        throw error.response;
+      });
+  },
+  doAnalizarTabla: async (schema, tabla) => {
+    const formData = new FormData();
+
+    formData.append("schema", schema);
+    formData.append("tabla", tabla);
+
+    return await axios
+      .post(global.url + "analize-table/schema", formData)
+      .then((response) => {
+        return response.status;
+      })
+      .catch((error) => {
+        throw error.response;
+      });
+  },
+  doAnalizarSchema: async (schema) => {
+    const formData = new FormData();
+
+    formData.append("schema", schema);
+
+    return await axios
+      .post(global.url + "analize/schema", formData)
+      .then((response) => {
+        return response.status;
+      })
+      .catch((error) => {
+        throw error.response;
+      });
+  },
+  doMonitoreo: async () => {
+    return await axios
+      .get(global.url + "monitoreo")
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        throw error.response;
+      });
+  },
+  doMonitoreo2: async () => {
+    return await axios
+      .get(global.url + "monitoreo2")
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        throw error.response;
+      });
+  },
+  doMonitoreo3: async () => {
+    return await axios
+      .get(global.url + "monitoreo3")
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        throw error.response;
+      });
+  },
+  /*doMonitoreo2: async (mon) => {
+    return await axios
+      .get(global.url + "monitoreo2/" + mon)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        throw error.response;
+      });
+  },*/
   deleteASchemaRestoreFile: async (schema) => {
     return await axios
       .delete(global.url + "recover/schemas/" + schema)
@@ -167,7 +265,7 @@ export default {
       });
   },
   createIndexOnTable: async (schema, table, fields) => {
-    const formData = new formData();
+    const formData = new FormData();
 
     let campos = "";
 
@@ -175,14 +273,16 @@ export default {
       if (index === fields.length - 1) {
         campos += element;
       } else {
-        campos += element + ",";
+        campos += element + ", ";
       }
     });
 
+    formData.append("schema", schema);
+    formData.append("table", table);
     formData.append("campos", campos);
 
     return await axios
-      .post(global.url + "backup/schemas/" + schema, formData)
+      .post(global.url + "create-index/schema", formData)
       .then((response) => {
         return response;
       })
