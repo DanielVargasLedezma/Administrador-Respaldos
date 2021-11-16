@@ -14,6 +14,16 @@ export default {
         throw error.response;
       });
   },
+  getRol: async (schema) => {
+    return await axios
+      .get(global.url + `roles-schema/${schema}`)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        throw error.response;
+      });
+  },
   getTablesFromSchema: async (schema) => {
     return await axios
       .get(global.url + "schemas/tablas/" + schema)
@@ -236,6 +246,41 @@ export default {
         throw error.response;
       });
   },
+  loadPriv: async () => {
+    return await axios
+      .get(global.url + "privileges")
+      .then((response) => {
+        return response;
+      })
+      .catch((error) => {
+        throw error.response;
+      });
+  },
+  createRol: async (rol_name, privilegios) => {
+    const formData = new FormData();
+
+    let privilegios_rol = "";
+
+    privilegios.forEach((element, index) => {
+      if (index === privilegios.length - 1) {
+        privilegios_rol += element;
+      } else {
+        privilegios_rol += element + "|";
+      }
+    });
+
+    formData.append("rol_name", rol_name);
+    formData.append("privilegios_rol", privilegios_rol);
+
+    return await axios
+      .post(global.url + "create/rol", formData)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        throw error.response;
+      });
+  },
   createTablespace: async (tablespace_name) => {
     const formData = new FormData();
 
@@ -323,6 +368,26 @@ export default {
 
     return await axios
       .post(global.url + "temporary-tablespaces/resize", formData)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        throw error.response;
+      });
+  },
+  asignarRolAUsuario: async (user, rol) => {
+    return await axios
+      .get(global.url + `asignar-rol/${user}/${rol}`)
+      .then((response) => {
+        return response.data;
+      })
+      .catch((error) => {
+        throw error.response;
+      });
+  },
+  desasignarRolAUsuario: async (user, rol) => {
+    return await axios
+      .get(global.url + `desasignar-rol/${user}/${rol}`)
       .then((response) => {
         return response.data;
       })

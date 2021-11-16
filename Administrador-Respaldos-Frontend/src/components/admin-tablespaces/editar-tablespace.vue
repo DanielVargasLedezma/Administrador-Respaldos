@@ -1,10 +1,10 @@
 <template>
   <div>
-    <label for="">Tipo de Tablespace a crear</label>
+    <label for="">Tipo de Tablespace a cambiar tamaño</label>
     <br /><br />
     <select id="seleccionar" ref="comboBoxT" @change="handleBoxChange">
       <option value="default" selected="Selected" disabled>
-        --Seleccione un tipo de respaldo--
+        --Seleccione un tipo de tablespace--
       </option>
       <option value="1">Tablespace</option>
       <option value="2">Temporary Tablespace</option>
@@ -30,7 +30,7 @@
       </select>
 
       <br /><br />
-      <label for="">Tamaño del tablespace</label>
+      <label for="">Tamaño del tablespace en MegaBytes</label>
       <br /><br />
       <input
         type="number"

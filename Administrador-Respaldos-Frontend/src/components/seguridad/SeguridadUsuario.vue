@@ -12,6 +12,9 @@
       <button @click="elegir" :disabled="sent || !opcion">
         Elegir Opcion de Seguridad
       </button>
+      <section v-if="sent">
+        <router-view></router-view>
+      </section>
     </div>
   </div>
 </template>
@@ -29,13 +32,13 @@ export default {
       this.sent = true;
 
       switch (this.opcion) {
-        case 1:
+        case "1":
           this.$router.push("/seguridad-usuario/asignacion-rol");
           break;
-        case 2:
+        case "2":
           this.$router.push("/seguridad-usuario/consultar-rol");
           break;
-        case 3:
+        case "3":
           this.$router.push("/seguridad-usuario/crear-rol");
           break;
 

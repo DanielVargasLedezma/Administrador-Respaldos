@@ -1,7 +1,7 @@
 <template>
   <div>
     <label class="label select-box1"
-      ><span class="label-desc">Elija que hacer xd</span>
+      ><span class="label-desc">Seleccione una tabla o schema</span>
     </label>
     <br /><br />
     <select @change="cambiarEleccion" name="respaldos" id="select-box1">

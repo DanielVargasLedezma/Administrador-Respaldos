@@ -1,37 +1,93 @@
 <template>
   <div>
-    <label>Nombre del rol</label>
-    <br /><br />
+    <p>Nombre del rol:</p>
     <input
       type="text"
       id="nombre_tbotemp"
-      placeholder="Digite el nombre del rol"
+      placeholder="Escriba el nombre del rol"
       v-model="texto"
     />
-    <br /><br />
-    <button @click="crearRol" :disabled="!opcion || sent">Crear Rol</button>
+    <br />
+    <p>Privilegios del Rol:</p>
+    <select @change="elegirPrivilegios" name="respaldos" id="select-box1">
+      <option value="default" selected="Selected" disabled>
+        -Seleccione un tipo de privilegio--
+      </option>
+      <option
+        v-for="(privilege, index) in privilegios"
+        :key="index"
+        :value="privilege.privilege"
+      >
+        {{ privilege.privilege }}
+      </option>
+    </select>
+    <button @click="crearRol" :disabled="!texto">Crear Rol</button>
+    <br />
+    <section v-if="privilegios_elegidos.length != 0">
+      <p>Privilegios elegidos para el rol:</p>
+      <ul>
+        <li
+          v-for="(privilegio, index) in privilegios_elegidos"
+          :key="index"
+          :value="privilegio"
+        >
+          {{ privilegio }}
+        </li>
+        <br /><br />
+      </ul>
+    </section>
   </div>
 </template>
 
 <script>
-/*        
-            return await axios
-      .post(global.url + "seguridad-usuarios/crear-rol/" + texto)
-      .then((response) => {
-        return response.status;
-      })
-      .catch((error) => {
-        throw error.response;
-      });*/
+import managerController from "../../controllers/managerController";
+
 export default {
   data() {
     return {
-      texto: "",
+      texto: null,
+      privilegios: [],
+      privilegios_elegidos: [],
+      repeated: [],
+      opcion: false,
+      sent: false,
     };
   },
+  async mounted() {
+    return await managerController
+      .loadPriv(this.texto)
+      .then((response) => {
+        this.privilegios = response.data;
+      })
+      .catch((error) => console.error(error));
+  },
   methods: {
-    crearRol: function () {
+    crearRol: async function () {
       console.log(this.texto);
+      return await managerController
+        .createRol(this.texto, this.privilegios_elegidos)
+        .then((response) => {
+          console.log(response);
+        })
+        .catch((error) => console.error(error));
+    },
+    cambiarEleccion: function (e) {
+      this.opcion = e.target.value;
+      this.sent = false;
+    },
+    elegirPrivilegios: function (e) {
+      if (!this.repeated.includes(e.target.value)) {
+        this.privilegios_elegidos = [
+          ...this.privilegios_elegidos,
+          e.target.value,
+        ];
+        this.repeated.push(e.target.value);
+      } else {
+        this.privilegios_elegidos = this.privilegios_elegidos.filter(
+          (item) => item !== e.target.value
+        );
+        this.repeated = this.repeated.filter((item) => item !== e.target.value);
+      }
     },
   },
 };

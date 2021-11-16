@@ -473,4 +473,58 @@ class StronkController extends Controller
 
         return response(['message' => 'Tablas re-analizadas'], 200);
     }
+
+    /**
+     * Return the list of privileges that a user can have.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function privileges()
+    {
+        return DB::table('DBA_SYS_PRIVS')
+            ->select('privilege')
+            ->distinct()
+            ->get();
+    }
+
+    public function createRol(Request $request)
+    {
+        $fields = $request->validate([
+            "rol_name" => "required",
+            "privilegios_rol" => "nullable",
+        ]);
+
+        DB::statement('alter session set "_oracle_script"=true');
+
+        DB::statement("CREATE ROLE " . $fields['rol_name'] . " NOT IDENTIFIED");
+
+        $privilegios = explode('|', $fields['privilegios_rol']);
+
+        foreach ($privilegios as $privilegio) {
+            DB::statement("GRANT $privilegio to " . $fields['rol_name']);
+        }
+
+        return response(['message' => 'Rol creado con los permisos especificados'], 201);
+    }
+
+    public function getRolOfUser($schema)
+    {
+        return DB::table('DBA_ROLE_PRIVS')
+            ->select('GRANTED_ROLE')
+            ->where('GRANTEE', $schema)
+            ->get();
+    }
+    public function asignarRolAUsuario($rol, $usuario)
+    {
+        DB::statement("GRANT  " . $rol . " FROM " . $usuario);
+
+        return response(null, 204);
+    }
+
+    public function desasignarRolAUsuario($rol, $usuario)
+    {
+        DB::statement("REVOKE " . $rol . " FROM " . $usuario);
+
+        return response(null, 204);
+    }
 }

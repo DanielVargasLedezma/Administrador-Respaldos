@@ -68,4 +68,14 @@ Route::prefix('ADR')->group(function () {
     Route::post('/analize/schema', [StronkController::class, 'analizeSchema']);
 
     Route::post('/analize-table/schema', [StronkController::class, 'analizeTableOfSchema']);
+
+    Route::post('/create/rol', [StronkController::class, 'createRol']);
+
+    Route::get('/privileges', [StronkController::class, 'privileges']);
+
+    Route::get('/roles-schema/{schema}', [StronkController::class, 'getRolOfUser']);
+
+    Route::post('/asignar-rol/{user}/{rol}', [StronkController::class, 'asignarRolAUsuario']);
+
+    Route::post('/desasignar-rol/{user}/{rol}', [StronkController::class, 'desasignarRolAUsuario']);
 });

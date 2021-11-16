@@ -1,48 +1,50 @@
 <template>
   <div>
-    <label class="label select-box1"
-      ><span class="label-desc">Escoja que quiere analizar</span>
-    </label>
-    <br /><br />
-    <select @change="cambiarEleccion" name="respaldos" id="select-box1">
-      <option value="default" selected="Selected" disabled>
-        --Seleccione que quiere analizar--
-      </option>
-      <option value="1">Schema</option>
-      <option value="2">Tabla</option>
-    </select>
-    <br /><br />
-    <section v-if="elegido">
-      <select @change="elegirSchema">
+    <div class="select-box">
+      <label class="label select-box1"
+        ><span class="label-desc">Escoja que quiere analizar</span>
+      </label>
+      <br /><br />
+      <select @change="cambiarEleccion" name="respaldos" id="select-box1">
         <option value="default" selected="Selected" disabled>
-          --Seleccione un schema--
+          --Seleccione que quiere analizar--
         </option>
-        <option
-          v-for="(schema, index) in schemas"
-          :key="index"
-          :value="schema.schema_name"
-        >
-          {{ schema.schema_name }}
-        </option>
+        <option value="1">Schema</option>
+        <option value="2">Tabla</option>
       </select>
       <br /><br />
-      <section v-if="!ellanomequiere">
-        <select @change="elegirTabla">
+      <section v-if="elegido">
+        <select @change="elegirSchema">
           <option value="default" selected="Selected" disabled>
-            --Seleccione un tablespace--
+            --Seleccione un schema--
           </option>
           <option
-            v-for="(tabla, index) in tablas"
+            v-for="(schema, index) in schemas"
             :key="index"
-            :value="tabla.table_name"
+            :value="schema.schema_name"
           >
-            {{ tabla.table_name }}
+            {{ schema.schema_name }}
           </option>
         </select>
         <br /><br />
+        <section v-if="!ellanomequiere">
+          <select @change="elegirTabla">
+            <option value="default" selected="Selected" disabled>
+              --Seleccione un tablespace--
+            </option>
+            <option
+              v-for="(tabla, index) in tablas"
+              :key="index"
+              :value="tabla.table_name"
+            >
+              {{ tabla.table_name }}
+            </option>
+          </select>
+          <br /><br />
+        </section>
+        <button v-on:click="hacerAnalizar" type="submit">Hacer Análisis</button>
       </section>
-      <button v-on:click="hacerAnalizar" type="submit">Hacer Análisis</button>
-    </section>
+    </div>
   </div>
 </template>
 
